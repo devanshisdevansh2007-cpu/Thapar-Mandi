@@ -7,37 +7,38 @@
 @layer base {
   :root {
     /* 
-      Requested Color Palette: 
+      Thapar Mandi Color Palette
       Background: #F5D6BA (HSL: 28 73% 85%)
       Cards: #F49D6E (HSL: 21 86% 69%)
+      Navbar: #E88C5F (slightly darker shade)
     */
     --background: 28 73% 85%;
-    --foreground: 20 61% 15%;
+    --foreground: 20 30% 20%;
 
     --card: 21 86% 69%;
-    --card-foreground: 20 61% 15%;
+    --card-foreground: 20 30% 20%;
 
     --popover: 28 73% 85%;
-    --popover-foreground: 20 61% 15%;
+    --popover-foreground: 20 30% 20%;
 
-    --primary: 15 65% 30%; /* Deep brown/rust for strong contrast buttons */
+    --primary: 21 85% 50%;
     --primary-foreground: 28 73% 95%;
 
     --secondary: 25 70% 75%;
-    --secondary-foreground: 20 61% 15%;
+    --secondary-foreground: 20 30% 20%;
 
     --muted: 21 50% 60%;
-    --muted-foreground: 20 40% 30%;
+    --muted-foreground: 20 40% 40%;
 
-    --accent: 15 80% 60%;
-    --accent-foreground: 20 61% 15%;
+    --accent: 21 85% 50%;
+    --accent-foreground: 28 73% 95%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
     --border: 21 50% 60%;
-    --input: 28 73% 92%; /* Slightly lighter than background for crisp inputs */
-    --ring: 15 65% 30%;
+    --input: 28 73% 92%;
+    --ring: 21 85% 50%;
 
     --radius: 1rem;
 
@@ -62,10 +63,10 @@
 
 @layer utilities {
   .glass-card {
-    @apply bg-card shadow-lg border border-white/20 backdrop-blur-sm;
+    @apply bg-card shadow-lg border border-black/10 backdrop-blur-sm;
   }
   
   .glass-input {
-    @apply bg-white/60 border border-white/30 focus:bg-white/90 focus:ring-4 focus:ring-primary/20 transition-all duration-300;
+    @apply bg-white/40 border border-black/10 focus:bg-white/60 focus:ring-4 focus:ring-primary/20 transition-all duration-300;
   }
 }

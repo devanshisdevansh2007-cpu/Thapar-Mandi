@@ -113,55 +113,61 @@ export function ItemDetails() {
             </div>
 
             {/* Seller Info & Action */}
-            <div className="mt-auto glass-card p-6 md:p-8 rounded-3xl shadow-xl border-2 border-white/40">
+            <div className="mt-auto glass-card p-6 md:p-8 rounded-3xl shadow-xl">
               {isOwner ? (
                 <div className="text-center space-y-4">
-                  <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-2">
+                  <div className="w-16 h-16 bg-primary/15 rounded-full flex items-center justify-center mx-auto mb-2">
                     <UserIcon className="w-8 h-8 text-primary" />
                   </div>
-                  <h3 className="text-xl font-bold">This is your listing</h3>
-                  <Link href="/my-listings" className="inline-block bg-white/50 text-foreground font-bold px-6 py-3 rounded-xl hover:bg-white/70 transition-colors">
+                  <h3 className="text-xl font-bold text-foreground">This is your listing</h3>
+                  <Link href="/my-listings" className="inline-block bg-primary text-primary-foreground font-bold px-6 py-3 rounded-xl hover:shadow-lg transition-all">
                     Manage Listing
                   </Link>
                 </div>
               ) : (
                 <div className="space-y-6">
                   <div className="flex items-center gap-4">
-                    <div className="w-14 h-14 bg-white/60 rounded-full flex items-center justify-center shadow-inner">
-                      <UserIcon className="w-7 h-7 text-primary/70" />
+                    <div className="w-14 h-14 bg-card rounded-full flex items-center justify-center shadow-sm border border-black/10">
+                      <UserIcon className="w-7 h-7 text-primary" />
                     </div>
-                    <div>
-                      <p className="text-sm font-bold text-foreground/60 uppercase tracking-wider mb-0.5">Seller</p>
-                      <p className="text-xl font-bold text-foreground">{seller?.name}</p>
+                    <div className="flex-1">
+                      <p className="text-xs font-bold text-foreground/60 uppercase tracking-wider mb-0.5">Seller</p>
+                      <p className="text-lg font-bold text-foreground">{seller?.name}</p>
                     </div>
-                    <div className="ml-auto flex items-center gap-1.5 text-primary text-sm font-bold bg-white/40 px-3 py-1.5 rounded-lg border border-white/50">
+                    <div className="flex items-center gap-1.5 text-primary text-xs font-bold bg-primary/10 px-3 py-1.5 rounded-lg border border-primary/20">
                       <ShieldCheck className="w-4 h-4" />
                       Verified
                     </div>
                   </div>
 
                   {showPhone ? (
-                    <div className="flex flex-col gap-3 pt-2">
-                      <div className="flex items-center justify-between bg-white/60 border-2 border-primary/20 p-4 rounded-xl shadow-inner">
-                        <span className="text-2xl font-display font-bold tracking-widest text-foreground">
+                    <motion.div 
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="flex flex-col gap-3 pt-2"
+                    >
+                      <div className="flex items-center justify-between bg-white/50 border-2 border-primary/30 p-4 rounded-xl shadow-sm">
+                        <span className="text-2xl font-display font-bold tracking-wider text-foreground font-mono">
                           {seller?.phoneNumber}
                         </span>
                         <button 
                           onClick={handleCopyPhone}
-                          className="p-3 bg-white hover:bg-primary hover:text-primary-foreground text-primary rounded-xl shadow-sm transition-all"
+                          data-testid="button-copy-phone"
+                          className="p-3 bg-primary text-primary-foreground hover:shadow-lg text-primary-foreground rounded-xl shadow-sm transition-all hover:-translate-y-0.5"
                           title="Copy Number"
                         >
                           {copied ? <Check className="w-6 h-6" /> : <Copy className="w-6 h-6" />}
                         </button>
                       </div>
-                      <p className="text-sm text-center font-medium text-foreground/60">
+                      <p className="text-sm text-center font-medium text-foreground/70">
                         Please mention you found this on Thapar Mandi when calling.
                       </p>
-                    </div>
+                    </motion.div>
                   ) : (
                     <button 
                       onClick={() => setShowPhone(true)}
-                      className="w-full bg-primary text-primary-foreground font-bold text-lg py-4 rounded-xl shadow-lg shadow-primary/20 hover:shadow-xl hover:-translate-y-0.5 active:translate-y-0 transition-all flex justify-center items-center gap-3 mt-2"
+                      data-testid="button-contact-seller"
+                      className="w-full bg-primary text-primary-foreground font-bold text-base py-4 px-4 rounded-xl shadow-lg shadow-primary/20 hover:shadow-xl hover:-translate-y-1 active:translate-y-0 transition-all flex justify-center items-center gap-3"
                     >
                       <Phone className="w-5 h-5" />
                       Contact Seller
