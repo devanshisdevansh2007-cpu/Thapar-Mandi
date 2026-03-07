@@ -8,6 +8,7 @@ import { useLocation } from "wouter";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, PlusCircle, Image as ImageIcon } from "lucide-react";
 import { motion } from "framer-motion";
+import imageCompression from "browser-image-compression";
 
 const formSchema = api.items.create.input.extend({
   price: z.coerce.number().positive("Price must be greater than 0"),
@@ -28,6 +29,22 @@ export function Sell() {
   const { mutateAsync: createItem, isPending } = useCreateItem();
   const [, setLocation] = useLocation();
   const { toast } = useToast();
+
+  const compressImage = async (file: File) => {
+    const options = {
+      maxSizeMB: 0.4,
+      maxWidthOrHeight: 900,
+      useWebWorker: true,
+    };
+
+    try {
+      const compressedFile = await imageCompression(file, options);
+      return compressedFile;
+    } catch (error) {
+      console.error(error);
+      return file;
+    }
+  };
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -142,18 +159,20 @@ export function Sell() {
                     type="file"
                     accept="image/*"
                     className="w-full glass-input px-4 py-3 rounded-xl outline-none"
-                    onChange={(e) => {
+                    onChange={async (e) => {
                       const file = e.target.files?.[0];
                       if (!file) return;
+
+                      const compressed = await compressImage(file);
 
                       const reader = new FileReader();
                       reader.onloadend = () => {
                         form.setValue("image", reader.result as string);
                       };
-                      reader.readAsDataURL(file);
+                      reader.readAsDataURL(compressed);
                     }}
                   />
- 
+
                   <p className="text-xs text-foreground/60 pl-1 font-medium">
                     Select a photo from your gallery or camera.
                   </p>
