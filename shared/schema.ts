@@ -8,7 +8,7 @@ export const users = pgTable("users", {
   email: text("email").notNull().unique(),
   phoneNumber: text("phone_number").notNull(),
   password: text("password").notNull(),
-  role: text("role").default("user")
+  role: text("role").default("user"),
 });
 
 export const items = pgTable("items", {
@@ -23,11 +23,15 @@ export const items = pgTable("items", {
 });
 
 export const insertUserSchema = createInsertSchema(users).omit({ id: true });
-export const insertItemSchema = createInsertSchema(items).omit({ id: true, sellerId: true, createdAt: true });
+export const insertItemSchema = createInsertSchema(items).omit({
+  id: true,
+  sellerId: true,
+  createdAt: true,
+});
 
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type Item = typeof items.$inferSelect;
 export type InsertItem = z.infer<typeof insertItemSchema>;
 
-export type UserWithoutPassword = Omit<User, 'password'>;
+export type UserWithoutPassword = Omit<User, "password">;
