@@ -45,6 +45,7 @@ app.get("/api/test-db", async (req, res) => {
         email: input.email,
         phoneNumber: input.phoneNumber,
         password: hashedPassword,
+        hostel: input.hostel,
         role: role,
       });
       req.login(user, (err) => {
