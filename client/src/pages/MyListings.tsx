@@ -106,7 +106,7 @@ export function MyListings() {
                         <input {...form.register("title")} className="glass-input px-3 py-2 rounded-lg" placeholder="Title" />
                         <input type="number" {...form.register("price")} className="glass-input px-3 py-2 rounded-lg" placeholder="Price" />
                         <select {...form.register("category")} className="glass-input px-3 py-2 rounded-lg">
-                          {["Books", "Electronics", "Vehicles", "Furniture", "Stationery", "Other"].map(c => (
+                          {["Books", "Electronics", "Vehicles", "Furniture", "Stationery","Food", "Other"].map(c => (
                             <option key={c} value={c}>{c}</option>
                           ))}
                         </select>
