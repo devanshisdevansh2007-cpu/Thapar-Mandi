@@ -3,10 +3,22 @@ import { useAuth } from "@/hooks/use-auth";
 import { Link } from "wouter";
 import { Store, PlusCircle, Package, ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
+import { useState } from "react";
 
 export function Dashboard() {
   const { user } = useAuth();
+const [hostel, setHostel] = useState(user?.hostel || "");
+  const updateHostel = async () => {
+  await fetch("/api/user/hostel", {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ hostel }),
+  });
 
+ window.location.reload();
+};
   const actions = [
     {
       title: "Browse Marketplace",
@@ -51,7 +63,44 @@ export function Dashboard() {
             What would you like to do today? You can browse items posted by other students or list your own.
           </p>
         </motion.div>
+<div className="glass-card p-6 rounded-2xl">
+  <label className="text-sm font-bold text-foreground block mb-2">
+    Update Your Hostel
+  </label>
 
+  <div className="flex gap-3">
+    <select
+      value={hostel}
+      onChange={(e) => setHostel(e.target.value)}
+      className="glass-input px-4 py-2 rounded-xl outline-none flex-1"
+    >
+      <option value="">Select Hostel</option>
+      <option value="M">M</option>
+      <option value="J">J</option>
+      <option value="H">H</option>
+      <option value="K">K</option>
+      <option value="A">A</option>
+      <option value="B">B</option>
+      <option value="C">C</option>
+      <option value="D">D</option>
+      <option value="O">O</option>
+      <option value="Q">Q</option>
+      <option value="G">G</option>
+      <option value="I">I</option>
+      <option value="E">E</option>
+      <option value="N">N</option>
+      <option value="FRG">FRG</option>
+      <option value="FRF">FRF</option>
+    </select>
+
+    <button
+      onClick={updateHostel}
+      className="bg-primary text-primary-foreground px-4 py-2 rounded-xl"
+    >
+      Update
+    </button>
+  </div>
+</div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {actions.map((action, i) => (
             <motion.div
