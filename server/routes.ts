@@ -42,9 +42,14 @@ if (!updatedUser) {
 });
   app.post(api.auth.signup.path, async (req, res) => {
     try {
-      const { otp, ...rest } = req.body;
-const input = api.auth.signup.input.parse(rest);
+    const { otp, confirmPassword, ...rest } = req.body;
 
+if (rest.password !== confirmPassword) {
+  return res.status(400).json({ message: "Passwords do not match" });
+}
+
+
+const input = api.auth.signup.input.parse(rest);
     const valid = verifyOTP(input.email, otp);
 
     if (!valid) {
