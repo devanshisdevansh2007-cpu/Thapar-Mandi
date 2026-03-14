@@ -157,7 +157,7 @@ const registerForm = useForm<z.infer<typeof registerSchema>>({
                 <label className="text-sm font-bold text-foreground pl-1">Full Name</label>
                 <input 
                   type="text" 
-                  maxLength={6}
+                  maxLength={50}
                   className="w-full glass-input px-4 py-3 rounded-xl outline-none"
                   placeholder="John Doe"
                   {...registerForm.register("name")}
