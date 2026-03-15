@@ -4,10 +4,9 @@ import { useLocation } from "wouter";
 type Chat = {
   id: number;
   item_id: number;
-  buyer_id: number;
-  seller_id: number;
+  buyer_id: string;
+  seller_id: string;
 };
-
 export default function MessagesPage() {
   const [chats, setChats] = useState<Chat[]>([]);
   const [loading, setLoading] = useState(true);
@@ -28,8 +27,12 @@ export default function MessagesPage() {
   };
 
   useEffect(() => {
-    fetchChats();
-  }, []);
+  fetchChats();
+
+  const interval = setInterval(fetchChats, 5000); // refresh every 5s
+  return () => clearInterval(interval);
+    
+}, []);
 
   if (loading) return <p className="p-4">Loading chats...</p>;
 
