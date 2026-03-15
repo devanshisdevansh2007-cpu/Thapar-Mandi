@@ -6,14 +6,14 @@ import { Phone, Copy, Check, ArrowLeft, ShieldCheck, Tag, Loader2, User as UserI
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { motion } from "framer-motion";
-
+import { useLocation } from "wouter";
 export function ItemDetails() {
   const params = useParams();
   const itemId = parseInt(params.id || "0");
   const { data: item, isLoading } = useItem(itemId);
   const { user } = useAuth();
   const { toast } = useToast();
-  
+  const [, navigate] = useLocation();
   const [showPhone, setShowPhone] = useState(false);
   const [copied, setCopied] = useState(false);
 
@@ -41,7 +41,7 @@ export function ItemDetails() {
   }
 
   const isOwner = user?.id === item.sellerId;
-  const seller = item.seller;
+  const seller = item.seller ?? null;
 
   const handleCopyPhone = () => {
     if (!seller) return;
@@ -50,6 +50,33 @@ export function ItemDetails() {
     toast({ title: "Phone number copied to clipboard!" });
     setTimeout(() => setCopied(false), 2000);
   };
+const startChat = async () => {
+  try {
+    const res = await fetch("/api/chat/create", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        itemId: item.id,
+        sellerId: item.sellerId,
+      }),
+    });
+
+    if (!res.ok) {
+      throw new Error("Failed to create chat");
+    }
+
+    const chat = await res.json();
+    navigate(`/messages/${chat.id}`);
+  } catch (err) {
+    console.error("Failed to start chat", err);
+    toast({
+      title: "Failed to start chat",
+      variant: "destructive",
+    });
+  }
+};
 
   const formattedPrice = new Intl.NumberFormat('en-IN', {
     style: 'currency',
@@ -164,15 +191,24 @@ export function ItemDetails() {
                       </p>
                     </motion.div>
                   ) : (
-                    <button 
-                      onClick={() => setShowPhone(true)}
-                      data-testid="button-contact-seller"
-                      className="w-full bg-primary text-primary-foreground font-bold text-base py-4 px-4 rounded-xl shadow-lg shadow-primary/20 hover:shadow-xl hover:-translate-y-1 active:translate-y-0 transition-all flex justify-center items-center gap-3"
-                    >
-                      <Phone className="w-5 h-5" />
-                      Contact Seller
-                    </button>
-                  )}
+  <>
+    <button 
+      onClick={() => setShowPhone(true)}
+      data-testid="button-contact-seller"
+      className="w-full bg-primary text-primary-foreground font-bold text-base py-4 px-4 rounded-xl shadow-lg shadow-primary/20 hover:shadow-xl hover:-translate-y-1 active:translate-y-0 transition-all flex justify-center items-center gap-3"
+    >
+      <Phone className="w-5 h-5" />
+      Contact Seller
+    </button>
+
+    <button
+      onClick={startChat}
+      className="w-full border-2 border-primary text-primary font-bold text-base py-4 px-4 rounded-xl hover:bg-primary/10 transition-all flex justify-center items-center gap-3"
+    >
+      💬 Message Seller
+    </button>
+  </>
+)}
                 </div>
               )}
             </div>
