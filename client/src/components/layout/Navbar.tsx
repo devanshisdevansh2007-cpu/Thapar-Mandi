@@ -1,6 +1,6 @@
 import { Link, useLocation } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
-import { Store, PlusCircle, LogOut, Package, Menu, X } from "lucide-react";
+import { Store, PlusCircle, LogOut, Package, Menu, X, MessageCircle } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -19,11 +19,12 @@ export function Navbar() {
     }
   };
 
-  const navItems = [
-    { label: "Marketplace", href: "/marketplace", icon: Store },
-    { label: "Sell Item", href: "/sell", icon: PlusCircle },
-    { label: "My Listings", href: "/my-listings", icon: Package },
-  ];
+ const navItems = [
+  { label: "Marketplace", href: "/marketplace", icon: Store },
+  { label: "Sell Item", href: "/sell", icon: PlusCircle },
+  { label: "My Listings", href: "/my-listings", icon: Package },
+  { label: "Messages", href: "/messages", icon: MessageCircle },
+];
 
   return (
     <nav className="sticky top-0 z-50 w-full glass-card border-b-0 rounded-none shadow-sm px-4 md:px-6 py-4">
