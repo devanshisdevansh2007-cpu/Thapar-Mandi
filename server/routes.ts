@@ -244,17 +244,29 @@ app.post("/api/chat/create", async (req, res) => {
   const { itemId, sellerId } = req.body;
   const buyerId = req.user!.id;
 
- const existing = await pool.query(
-  `SELECT * FROM chats
-   WHERE (buyer_id=$1 AND seller_id=$2)
-   OR (buyer_id=$2 AND seller_id=$1)
-   LIMIT 1`,
-  [buyerId, sellerId]
-);
+  const existing = await pool.query(
+    `SELECT * FROM chats
+     WHERE (buyer_id=$1 AND seller_id=$2)
+     OR (buyer_id=$2 AND seller_id=$1)
+     LIMIT 1`,
+    [buyerId, sellerId]
+  );
+
+  // CHAT EXISTS → update item
   if (existing.rows.length > 0) {
-    return res.json(existing.rows[0]);
+
+    const updated = await pool.query(
+      `UPDATE chats
+       SET item_id = $1
+       WHERE id = $2
+       RETURNING *`,
+      [itemId, existing.rows[0].id]
+    );
+
+    return res.json(updated.rows[0]);
   }
 
+  // CREATE NEW CHAT
   const result = await pool.query(
     `INSERT INTO chats (item_id, buyer_id, seller_id)
      VALUES ($1,$2,$3)
