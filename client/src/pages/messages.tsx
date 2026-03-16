@@ -3,9 +3,9 @@ import { useLocation } from "wouter";
 
 type Chat = {
   id: number;
-  item_id: number;
-  buyer_id: string;
-  seller_id: string;
+  item_title: string;
+  other_user: string;
+  last_message: string;
 };
 export default function MessagesPage() {
   const [chats, setChats] = useState<Chat[]>([]);
@@ -13,18 +13,22 @@ export default function MessagesPage() {
   const [, navigate] = useLocation();
 
   const fetchChats = async () => {
-    try {
-      const res = await fetch("/api/chat/user/me");
-      if (!res.ok) return;
+  try {
+    const res = await fetch("/api/chat/user/me");
 
-      const data = await res.json();
-      setChats(data);
-    } catch (err) {
-      console.error("Error fetching chats", err);
-    } finally {
+    if (!res.ok) {
       setLoading(false);
+      return;
     }
-  };
+
+    const data = await res.json();
+    setChats(data);
+  } catch (err) {
+    console.error("Error fetching chats", err);
+  } finally {
+    setLoading(false);
+  }
+};
 
   useEffect(() => {
   fetchChats();
@@ -36,12 +40,12 @@ export default function MessagesPage() {
 
   if (loading) {
   return (
-    <div className="max-w-xl mx-auto mt-10 space-y-4">
+   <div className="max-w-2xl mx-auto p-4 space-y-4">
 
       {[1,2,3,4].map((i) => (
         <div
           key={i}
-          className="flex items-center gap-4 p-4 border rounded-xl"
+          className="flex items-center gap-4 p-4 border border-border rounded-xl bg-card/40"
         >
 
           {/* avatar skeleton */}
@@ -70,18 +74,39 @@ export default function MessagesPage() {
         </p>
       )}
 
-      {chats.map((chat) => (
-        <div
-          key={chat.id}
-          className="border rounded-lg p-4 mb-3 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition"
-          onClick={() => navigate(`/messages/${chat.id}`)}
-        >
-          <div className="font-semibold">Chat #{chat.id}</div>
-          <div className="text-sm text-muted-foreground">
-            Click to open conversation
-          </div>
+     {chats.map((chat) => (
+  <div
+    key={chat.id}
+    className="border border-border rounded-xl p-4 mb-3 cursor-pointer hover:bg-card/40 transition"
+    onClick={() => navigate(`/messages/${chat.id}`)}
+  >
+    <div className="flex items-center gap-3">
+
+      {/* Avatar */}
+      <div className="w-10 h-10 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center font-semibold text-primary">
+       {chat.other_user
+  ? chat.other_user.split(" ").map(n => n[0]).join("").slice(0,2)
+  : "U"}
+      </div>
+
+      {/* Chat Info */}
+      <div className="flex-1">
+        <div className="font-semibold">
+          {chat.other_user || "Unknown user"}
         </div>
-      ))}
+
+        <div className="text-sm text-muted-foreground">
+          Regarding: {chat.item_title}
+        </div>
+
+        <div className="text-sm text-gray-500 truncate">
+          {chat.last_message || "Start conversation"}
+        </div>
+      </div>
+
+    </div>
+  </div>
+))}
     </div>
   );
 }
