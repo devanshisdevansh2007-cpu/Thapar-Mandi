@@ -286,13 +286,32 @@ app.post("/api/chat/send", async (req, res) => {
   const senderId = req.user!.id;
 
   const result = await pool.query(
-    `INSERT INTO messages (chat_id, sender_id, message)
-     VALUES ($1,$2,$3)
+    `INSERT INTO messages (chat_id, sender_id, message, read)
+     VALUES ($1,$2,$3,false)
      RETURNING *`,
     [chatId, senderId, message]
   );
 
   res.json(result.rows[0]);
+});
+
+  // Mark messages as read
+app.post("/api/chat/:chatId/read", async (req, res) => {
+  if (!req.isAuthenticated())
+    return res.status(401).json({ message: "Unauthorized" });
+
+  const { chatId } = req.params;
+  const userId = req.user!.id;
+
+  await pool.query(
+    `UPDATE messages
+     SET read = true
+     WHERE chat_id = $1
+     AND sender_id != $2`,
+    [chatId, userId]
+  );
+
+  res.json({ success: true });
 });
 
 // Get messages
