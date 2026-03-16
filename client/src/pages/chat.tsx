@@ -33,7 +33,13 @@ const { user } = useAuth();
   useEffect(() => {
   fetchMessages();
 
+  // mark messages as read
+  fetch(`/api/chat/${chatId}/read`, {
+    method: "POST",
+  });
+
   const interval = setInterval(fetchMessages, 2000);
+
   return () => clearInterval(interval);
 }, [chatId]);
 useEffect(() => {
