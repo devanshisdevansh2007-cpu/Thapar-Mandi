@@ -381,7 +381,7 @@ ORDER BY chats.created_at DESC
 `,
 [userId]
 );
-);
+
 
   res.json(result.rows);
 });
