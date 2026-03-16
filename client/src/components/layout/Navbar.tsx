@@ -26,11 +26,11 @@ useEffect(() => {
       const data = await res.json();
 
       const total = data.reduce(
-        (sum: number, chat: any) => sum + (chat.unread_count || 0),
-        0
-      );
+  (sum: number, chat: any) => sum + Number(chat.unread_count || 0),
+  0
+);
 
-      setUnreadTotal(total);
+      setUnreadTotal(Number(total));
     } catch (err) {
       console.error("Unread fetch error", err);
     }
