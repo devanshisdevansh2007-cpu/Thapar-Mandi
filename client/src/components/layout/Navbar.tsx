@@ -1,13 +1,14 @@
 import { Link, useLocation } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
 import { Store, PlusCircle, LogOut, Package, Menu, X, MessageCircle } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 
 export function Navbar() {
   const { user, logout } = useAuth();
   const [location] = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [unreadTotal, setUnreadTotal] = useState(0);
   const { toast } = useToast();
 
   const handleLogout = async () => {
@@ -18,7 +19,28 @@ export function Navbar() {
       toast({ title: "Logout failed", variant: "destructive" });
     }
   };
+useEffect(() => {
+  const fetchUnread = async () => {
+    try {
+      const res = await fetch("/api/chat/user/me");
+      const data = await res.json();
 
+      const total = data.reduce(
+        (sum: number, chat: any) => sum + (chat.unread_count || 0),
+        0
+      );
+
+      setUnreadTotal(total);
+    } catch (err) {
+      console.error("Unread fetch error", err);
+    }
+  };
+
+  fetchUnread();
+
+  const interval = setInterval(fetchUnread, 5000);
+  return () => clearInterval(interval);
+}, []);
  const navItems = [
   { label: "Marketplace", href: "/marketplace", icon: Store },
   { label: "Sell Item", href: "/sell", icon: PlusCircle },
@@ -45,16 +67,22 @@ export function Navbar() {
               {navItems.map((item) => {
                 const isActive = location === item.href;
                 return (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    className={`flex items-center gap-2 text-sm font-semibold transition-colors hover:text-primary ${
-                      isActive ? "text-primary" : "text-foreground/80"
-                    }`}
-                  >
-                    <item.icon className="w-4 h-4" />
-                    {item.label}
-                  </Link>
+                 <Link
+  key={item.href}
+  href={item.href}
+  className={`relative flex items-center gap-2 text-sm font-semibold transition-colors hover:text-primary ${
+    isActive ? "text-primary" : "text-foreground/80"
+  }`}
+>
+  <item.icon className="w-4 h-4" />
+  {item.label}
+
+  {item.label === "Messages" && unreadTotal > 0 && (
+    <span className="absolute -top-2 -right-3 bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">
+      {unreadTotal > 9 ? "9+" : unreadTotal}
+    </span>
+  )}
+</Link>
                 );
               })}
               <div className="h-6 w-px bg-white/30 mx-2" />
@@ -108,14 +136,20 @@ export function Navbar() {
               </div>
               {navItems.map((item) => (
                 <Link
-                  key={item.href}
-                  href={item.href}
-                  className="flex items-center gap-3 px-2 py-2 text-foreground/80 font-medium hover:text-primary"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  <item.icon className="w-5 h-5" />
-                  {item.label}
-                </Link>
+  key={item.href}
+  href={item.href}
+  className="relative flex items-center gap-3 px-2 py-2 text-foreground/80 font-medium hover:text-primary"
+  onClick={() => setIsMobileMenuOpen(false)}
+>
+  <item.icon className="w-5 h-5" />
+  {item.label}
+
+  {item.label === "Messages" && unreadTotal > 0 && (
+    <span className="ml-auto bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">
+      {unreadTotal > 9 ? "9+" : unreadTotal}
+    </span>
+  )}
+</Link>
               ))}
               <button
                 onClick={() => {
