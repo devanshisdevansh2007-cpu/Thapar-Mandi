@@ -18,7 +18,9 @@ export interface IStorage {
   getItemsBySeller(sellerId: number): Promise<Item[]>;
   updateItem(id: number, item: Partial<InsertItem>): Promise<Item | undefined>;
   deleteItem(id: number): Promise<boolean>;
-
+ updateUserResetToken(userId: number, token: string, expiry: Date): Promise<void>;
+  getUserByResetToken(token: string): Promise<User | undefined>;
+  updateUserPassword(userId: number, newPassword: string): Promise<void>;
   sessionStore: session.Store;
 }
 
@@ -54,6 +56,33 @@ async updateUser(id: number, data: Partial<InsertUser>): Promise<User | undefine
     .returning();
 
   return user;
+}
+  async updateUserResetToken(userId: number, token: string, expiry: Date): Promise<void> {
+  await db
+    .update(users)
+    .set({
+      reset_token: token,
+      reset_token_expiry: expiry,
+    })
+    .where(eq(users.id, userId));
+}
+  async getUserByResetToken(token: string): Promise<User | undefined> {
+  const [user] = await db
+    .select()
+    .from(users)
+    .where(eq(users.reset_token, token));
+
+  return user;
+}
+  async updateUserPassword(userId: number, newPassword: string): Promise<void> {
+  await db
+    .update(users)
+    .set({
+      password: newPassword,
+      reset_token: null,
+      reset_token_expiry: null,
+    })
+    .where(eq(users.id, userId));
 }
   async createItem(insertItem: InsertItem & { sellerId: number }): Promise<Item> {
     const [item] = await db.insert(items).values(insertItem).returning();
