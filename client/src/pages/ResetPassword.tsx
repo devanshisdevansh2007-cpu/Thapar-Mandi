@@ -8,6 +8,7 @@ export default function ResetPassword() {
   const [message, setMessage] = useState("");
 
   const handleReset = async () => {
+  try {
     const res = await fetch(`/auth/reset-password/${token}`, {
       method: "POST",
       headers: {
@@ -17,9 +18,17 @@ export default function ResetPassword() {
     });
 
     const data = await res.json();
-    setMessage("Password updated successfully");
-  };
 
+    if (!res.ok) {
+      setMessage(data.message || "Something went wrong");
+      return;
+    }
+
+    setMessage("✅ Password updated successfully");
+  } catch (err) {
+    setMessage("❌ Network error");
+  }
+};
   return (
     <div className="flex flex-col items-center justify-center h-screen gap-4">
       <h1 className="text-xl font-semibold">Reset Password</h1>
