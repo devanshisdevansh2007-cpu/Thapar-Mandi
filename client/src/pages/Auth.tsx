@@ -139,6 +139,13 @@ const registerForm = useForm<z.infer<typeof registerSchema>>({
                   placeholder="••••••••"
                   {...loginForm.register("password")}
                 />
+                <div className="text-right">
+  <Link href="/forgot-password">
+    <span className="text-sm text-primary hover:underline font-semibold cursor-pointer">
+      Forgot Password?
+    </span>
+  </Link>
+</div>
                 {loginForm.formState.errors.password && (
                   <p className="text-destructive text-sm font-medium pl-1">{loginForm.formState.errors.password.message}</p>
                 )}
