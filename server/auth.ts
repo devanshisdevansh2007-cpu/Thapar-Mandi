@@ -95,7 +95,9 @@ app.post("/auth/forgot-password", async (req, res) => {
   app.post("/auth/reset-password/:token", async (req, res) => {
   const { token } = req.params;
   const { newPassword } = req.body;
-
+ if (!newPassword) {
+    return res.status(400).json({ message: "Password required" });
+  }
   try {
     const user = await storage.getUserByResetToken(token);
 
