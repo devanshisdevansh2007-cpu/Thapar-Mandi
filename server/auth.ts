@@ -78,7 +78,7 @@ app.post("/auth/forgot-password", async (req, res) => {
     const resetLink = `http://localhost:5173/reset-password/${token}`;
 
     await resend.emails.send({
-    from: "Thapar Mandi <noreply@yourdomain.com>",
+    from: "noreply@thaparmandi.store",
      
     to: email,
       subject: "Reset Password",
