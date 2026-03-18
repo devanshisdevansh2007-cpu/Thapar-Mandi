@@ -3,6 +3,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { Store, PlusCircle, LogOut, Package, Menu, X, MessageCircle } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
+import ThemeToggle from "@/components/ThemeToggle"; // ✅ ADD THIS
 
 export function Navbar() {
   const { user, logout } = useAuth();
@@ -19,38 +20,41 @@ export function Navbar() {
       toast({ title: "Logout failed", variant: "destructive" });
     }
   };
-useEffect(() => {
-  const fetchUnread = async () => {
-    try {
-      const res = await fetch("/api/chat/user/me");
-      const data = await res.json();
 
-      const total = data.reduce(
-  (sum: number, chat: any) => sum + Number(chat.unread_count || 0),
-  0
-);
+  useEffect(() => {
+    const fetchUnread = async () => {
+      try {
+        const res = await fetch("/api/chat/user/me");
+        const data = await res.json();
 
-      setUnreadTotal(Number(total));
-    } catch (err) {
-      console.error("Unread fetch error", err);
-    }
-  };
+        const total = data.reduce(
+          (sum: number, chat: any) => sum + Number(chat.unread_count || 0),
+          0
+        );
 
-  fetchUnread();
+        setUnreadTotal(Number(total));
+      } catch (err) {
+        console.error("Unread fetch error", err);
+      }
+    };
 
-  const interval = setInterval(fetchUnread, 5000);
-  return () => clearInterval(interval);
-}, []);
- const navItems = [
-  { label: "Marketplace", href: "/marketplace", icon: Store },
-  { label: "Sell Item", href: "/sell", icon: PlusCircle },
-  { label: "My Listings", href: "/my-listings", icon: Package },
-  { label: "Messages", href: "/messages", icon: MessageCircle },
-];
+    fetchUnread();
+    const interval = setInterval(fetchUnread, 5000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const navItems = [
+    { label: "Marketplace", href: "/marketplace", icon: Store },
+    { label: "Sell Item", href: "/sell", icon: PlusCircle },
+    { label: "My Listings", href: "/my-listings", icon: Package },
+    { label: "Messages", href: "/messages", icon: MessageCircle },
+  ];
 
   return (
-    <nav className="sticky top-0 z-50 w-full glass-card border-b-0 rounded-none shadow-sm px-4 md:px-6 py-4">
+    <nav className="sticky top-0 z-50 w-full glass-card border-b border-border rounded-none shadow-sm px-4 md:px-6 py-4">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
+
+        {/* LOGO */}
         <Link href="/" className="flex items-center gap-2 group">
           <div className="bg-primary text-primary-foreground p-2 rounded-xl group-hover:scale-105 transition-transform">
             <Store className="w-5 h-5" />
@@ -60,33 +64,39 @@ useEffect(() => {
           </span>
         </Link>
 
-        {/* Desktop Nav */}
+        {/* DESKTOP NAV */}
         <div className="hidden md:flex items-center gap-6">
           {user ? (
             <>
               {navItems.map((item) => {
                 const isActive = location === item.href;
                 return (
-                 <Link
-  key={item.href}
-  href={item.href}
-  className={`relative flex items-center gap-2 text-sm font-semibold transition-colors hover:text-primary ${
-    isActive ? "text-primary" : "text-foreground/80"
-  }`}
->
-  <item.icon className="w-4 h-4" />
-  {item.label}
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className={`relative flex items-center gap-2 text-sm font-semibold transition-colors hover:text-primary ${
+                      isActive ? "text-primary" : "text-foreground/80"
+                    }`}
+                  >
+                    <item.icon className="w-4 h-4" />
+                    {item.label}
 
-  {item.label === "Messages" && unreadTotal > 0 && (
-    <span className="absolute -top-2 -right-3 bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">
-      {unreadTotal > 9 ? "9+" : unreadTotal}
-    </span>
-  )}
-</Link>
+                    {item.label === "Messages" && unreadTotal > 0 && (
+                      <span className="absolute -top-2 -right-3 bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">
+                        {unreadTotal > 9 ? "9+" : unreadTotal}
+                      </span>
+                    )}
+                  </Link>
                 );
               })}
-              <div className="h-6 w-px bg-white/30 mx-2" />
-              <div className="flex items-center gap-3 bg-white/20 px-4 py-2 rounded-full">
+
+              {/* 🔥 THEME TOGGLE */}
+              <ThemeToggle />
+
+              <div className="h-6 w-px bg-border mx-2" />
+
+              {/* USER */}
+              <div className="flex items-center gap-3 bg-card px-4 py-2 rounded-full border border-border">
                 <span className="text-sm font-medium text-foreground">
                   {user.name.split(" ")[0]}
                 </span>
@@ -101,12 +111,15 @@ useEffect(() => {
             </>
           ) : (
             <div className="flex items-center gap-4">
+              <ThemeToggle /> {/* 🔥 ALSO FOR LOGGED OUT */}
+
               <Link
                 href="/login"
                 className="text-sm font-semibold text-foreground/80 hover:text-primary transition-colors"
               >
                 Log in
               </Link>
+
               <Link
                 href="/signup"
                 className="bg-primary text-primary-foreground px-5 py-2.5 rounded-xl text-sm font-bold shadow-lg shadow-primary/20 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-primary/30 active:translate-y-0 transition-all"
@@ -117,7 +130,7 @@ useEffect(() => {
           )}
         </div>
 
-        {/* Mobile Menu Toggle */}
+        {/* MOBILE BUTTON */}
         <button
           className="md:hidden p-2 text-foreground"
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -126,31 +139,37 @@ useEffect(() => {
         </button>
       </div>
 
-      {/* Mobile Nav */}
+      {/* MOBILE MENU */}
       {isMobileMenuOpen && (
-        <div className="md:hidden absolute top-full left-0 right-0 glass-card rounded-b-2xl border-t border-white/20 p-4 flex flex-col gap-4 shadow-xl">
+        <div className="md:hidden absolute top-full left-0 right-0 glass-card rounded-b-2xl border-t border-border p-4 flex flex-col gap-4 shadow-xl">
+
+          {/* 🔥 MOBILE THEME TOGGLE */}
+          <ThemeToggle />
+
           {user ? (
             <>
-              <div className="pb-3 border-b border-white/20 px-2 text-sm font-medium">
+              <div className="pb-3 border-b border-border px-2 text-sm font-medium text-foreground">
                 Signed in as {user.name}
               </div>
+
               {navItems.map((item) => (
                 <Link
-  key={item.href}
-  href={item.href}
-  className="relative flex items-center gap-3 px-2 py-2 text-foreground/80 font-medium hover:text-primary"
-  onClick={() => setIsMobileMenuOpen(false)}
->
-  <item.icon className="w-5 h-5" />
-  {item.label}
+                  key={item.href}
+                  href={item.href}
+                  className="relative flex items-center gap-3 px-2 py-2 text-foreground/80 font-medium hover:text-primary"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  <item.icon className="w-5 h-5" />
+                  {item.label}
 
-  {item.label === "Messages" && unreadTotal > 0 && (
-    <span className="ml-auto bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">
-      {unreadTotal > 9 ? "9+" : unreadTotal}
-    </span>
-  )}
-</Link>
+                  {item.label === "Messages" && unreadTotal > 0 && (
+                    <span className="ml-auto bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">
+                      {unreadTotal > 9 ? "9+" : unreadTotal}
+                    </span>
+                  )}
+                </Link>
               ))}
+
               <button
                 onClick={() => {
                   handleLogout();
@@ -166,11 +185,12 @@ useEffect(() => {
             <div className="flex flex-col gap-3">
               <Link
                 href="/login"
-                className="w-full text-center py-3 rounded-xl bg-white/40 font-semibold"
+                className="w-full text-center py-3 rounded-xl bg-card text-foreground font-semibold border border-border"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 Log in
               </Link>
+
               <Link
                 href="/signup"
                 className="w-full text-center py-3 rounded-xl bg-primary text-primary-foreground font-bold shadow-md"
