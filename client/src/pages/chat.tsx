@@ -78,7 +78,25 @@ useEffect(() => {
 }, [messages]);
   return (
     <div className="max-w-2xl mx-auto p-4">
-      <h2 className="text-xl font-bold mb-4">Chat</h2>
+     <div className="flex items-center gap-3 mb-3 border-b pb-3">
+
+  {/* Avatar */}
+  <div className="w-10 h-10 rounded-full bg-orange-400 text-white flex items-center justify-center font-bold">
+    {product?.seller_name?.[0]?.toUpperCase() || "U"}
+  </div>
+
+  {/* Name + Status */}
+  <div className="flex flex-col">
+    <span className="text-sm font-semibold">
+      {product?.seller_name || "Seller"}
+    </span>
+
+    <span className="text-xs text-gray-500">
+      🟢 Online
+    </span>
+  </div>
+
+</div>
      {product && (
   <div className="flex items-center gap-3 border rounded-lg p-3 mb-3 bg-white dark:bg-gray-800 shadow-sm">
     
