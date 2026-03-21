@@ -4,12 +4,16 @@ import { useAuth } from "@/hooks/use-auth";
 export default function ChatPage() {
   const { chatId } = useParams();
   const [messages, setMessages] = useState<any[]>([]);
+  const [product, setProduct] = useState<any>(null);
   const [text, setText] = useState("");
 const { user } = useAuth();
   const fetchMessages = async () => {
     const res = await fetch(`/api/chat/${chatId}`);
     const data = await res.json();
-    setMessages(data);
+
+// handle both cases (safe)
+setMessages(data.messages || data);
+setProduct(data.product || null);
   };
 
   const formatTime = (date) => {
@@ -74,7 +78,28 @@ useEffect(() => {
   return (
     <div className="max-w-2xl mx-auto p-4">
       <h2 className="text-xl font-bold mb-4">Chat</h2>
+      {product && (
+  <div className="flex items-center gap-3 border rounded-lg p-3 mb-3 bg-white dark:bg-gray-800 shadow-sm">
+    
+    {/* Image */}
+    <img
+      src={product.image}
+      alt="product"
+      className="w-12 h-12 object-cover rounded"
+    />
 
+    {/* Info */}
+    <div className="flex-1">
+      <p className="text-sm font-semibold">{product.title}</p>
+      <p className="text-xs text-gray-500">₹{product.price}</p>
+    </div>
+
+    {/* Optional */}
+    <button className="text-xs text-blue-500">
+      View
+    </button>
+  </div>
+)}
    <div
   id="chat-container"
   className="border rounded-lg p-4 h-[400px] overflow-y-auto mb-4 flex flex-col gap-2"
