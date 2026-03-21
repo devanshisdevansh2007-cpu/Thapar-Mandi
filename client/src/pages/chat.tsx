@@ -11,7 +11,7 @@ const { user } = useAuth();
   const fetchMessages = async () => {
     const res = await fetch(`/api/chat/${chatId}`);
     const data = await res.json();
-
+    
 // handle both cases (safe)
 setMessages(data.messages || data);
 setProduct(data.product || null);
@@ -62,7 +62,7 @@ setProduct(data.product || null);
 
   useEffect(() => {
   fetchMessages();
-
+  
   // mark messages as read
   fetch(`/api/chat/${chatId}/read`, {
     method: "POST",
@@ -76,6 +76,9 @@ useEffect(() => {
   const el = document.getElementById("chat-container");
   if (el) el.scrollTop = el.scrollHeight;
 }, [messages]);
+  const isOnline =
+  product?.last_seen &&
+  new Date().getTime() - new Date(product.last_seen).getTime() < 2 * 60 * 1000;
   return (
     <div className="max-w-2xl mx-auto p-4">
      <div className="flex items-center gap-3 mb-3 border-b pb-3">
@@ -91,9 +94,13 @@ useEffect(() => {
       {product?.seller_name || "Seller"}
     </span>
 
-    <span className="text-xs text-gray-500">
-      🟢 Online
-    </span>
+   <span className="text-xs text-gray-500">
+  {isOnline
+    ? "🟢 Online"
+    : product?.last_seen
+    ? `Last seen ${formatTime(product.last_seen)}`
+    : "Offline"}
+</span>
   </div>
 
 </div>
