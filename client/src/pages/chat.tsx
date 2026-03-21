@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from "wouter";
+import { Link } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
 export default function ChatPage() {
   const { chatId } = useParams();
@@ -95,9 +96,11 @@ useEffect(() => {
     </div>
 
     {/* Optional */}
-    <button className="text-xs text-blue-500">
-      View
-    </button>
+    <Link href={`/item/${product.id}`}>
+  <span className="text-xs text-blue-500 cursor-pointer">
+    View
+  </span>
+</Link>
   </div>
 )}
    <div
