@@ -285,14 +285,20 @@ app.post("/api/chat/send", async (req, res) => {
   const { chatId, message } = req.body;
   const senderId = req.user!.id;
 
-  const result = await pool.query(
-    `INSERT INTO messages (chat_id, sender_id, message, read)
-     VALUES ($1,$2,$3,false)
-     RETURNING *`,
-    [chatId, senderId, message]
-  );
+ const result = await pool.query(
+  `INSERT INTO messages (chat_id, sender_id, message, read)
+   VALUES ($1,$2,$3,false)
+   RETURNING *`,
+  [chatId, senderId, message]
+);
 
-  res.json(result.rows[0]);
+// ✅ ADD THIS
+await pool.query(
+  `UPDATE users SET last_seen = NOW() WHERE id = $1`,
+  [senderId]
+);
+
+res.json(result.rows[0]);
 });
 
   // Mark messages as read
@@ -319,6 +325,14 @@ app.get("/api/chat/:chatId", async (req, res) => {
   const { chatId } = req.params;
 
   try {
+    // ✅ Update last_seen
+    if (req.isAuthenticated()) {
+      await pool.query(
+        `UPDATE users SET last_seen = NOW() WHERE id = $1`,
+        [req.user!.id]
+      );
+    }
+
     // 1. Get messages
     const messagesResult = await pool.query(
       `SELECT * FROM messages
@@ -339,18 +353,19 @@ app.get("/api/chat/:chatId", async (req, res) => {
 
     // 3. Get product using item_id
     if (chat?.item_id) {
-     const productResult = await pool.query(
-  `SELECT 
-     items.id,
-     items.title,
-     items.price,
-     items.image,
-     users.name AS seller_name
-   FROM items
-   JOIN users ON items.seller_id = users.id
-   WHERE items.id = $1`,
-  [chat.item_id]
-);
+      const productResult = await pool.query(
+        `SELECT 
+           items.id,
+           items.title,
+           items.price,
+           items.image,
+           users.name AS seller_name,
+           users.last_seen
+         FROM items
+         JOIN users ON items.seller_id = users.id
+         WHERE items.id = $1`,
+        [chat.item_id]
+      );
 
       product = productResult.rows[0];
     }
