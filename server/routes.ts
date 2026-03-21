@@ -347,7 +347,7 @@ app.get("/api/chat/:chatId", async (req, res) => {
      items.image,
      users.name AS seller_name
    FROM items
-   JOIN users ON items.user_id = users.id
+   JOIN users ON items.seller_id = users.id
    WHERE items.id = $1`,
   [chat.item_id]
 );
