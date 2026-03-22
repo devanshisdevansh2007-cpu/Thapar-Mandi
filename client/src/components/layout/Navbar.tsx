@@ -3,19 +3,26 @@ import { useAuth } from "@/hooks/use-auth";
 import { Store, PlusCircle, LogOut, Package, Menu, X, MessageCircle } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
-import ThemeToggle from "@/components/ThemeToggle"; // ✅ ADD THIS
+import ThemeToggle from "@/components/ThemeToggle";
 
 export function Navbar() {
-  const { user, logout } = useAuth();
+  const { user } = useAuth(); // ❌ removed logout from here
   const [location] = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [unreadTotal, setUnreadTotal] = useState(0);
   const { toast } = useToast();
 
+  // ✅ FIXED LOGOUT
   const handleLogout = async () => {
     try {
-      await logout();
-      toast({ title: "Logged out successfully" });
+      await fetch("/auth/logout", {
+        method: "POST",
+        credentials: "include",
+      });
+
+      // 🔥 FORCE FULL RESET (MAIN FIX)
+      window.location.href = "/login";
+
     } catch (e) {
       toast({ title: "Logout failed", variant: "destructive" });
     }
@@ -24,7 +31,9 @@ export function Navbar() {
   useEffect(() => {
     const fetchUnread = async () => {
       try {
-        const res = await fetch("/api/chat/user/me");
+        const res = await fetch("/api/chat/user/me", {
+          credentials: "include", // ✅ added
+        });
         const data = await res.json();
 
         const total = data.reduce(
@@ -54,7 +63,6 @@ export function Navbar() {
     <nav className="sticky top-0 z-50 w-full glass-card border-b border-border rounded-none shadow-sm px-4 md:px-6 py-4">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
 
-        {/* LOGO */}
         <Link href="/" className="flex items-center gap-2 group">
           <div className="bg-primary text-primary-foreground p-2 rounded-xl group-hover:scale-105 transition-transform">
             <Store className="w-5 h-5" />
@@ -64,7 +72,6 @@ export function Navbar() {
           </span>
         </Link>
 
-        {/* DESKTOP NAV */}
         <div className="hidden md:flex items-center gap-6">
           {user ? (
             <>
@@ -90,12 +97,9 @@ export function Navbar() {
                 );
               })}
 
-              {/* 🔥 THEME TOGGLE */}
               <ThemeToggle />
-
               <div className="h-6 w-px bg-border mx-2" />
 
-              {/* USER */}
               <div className="flex items-center gap-3 bg-card px-4 py-2 rounded-full border border-border">
                 <span className="text-sm font-medium text-foreground">
                   {user.name.split(" ")[0]}
@@ -111,7 +115,7 @@ export function Navbar() {
             </>
           ) : (
             <div className="flex items-center gap-4">
-              <ThemeToggle /> {/* 🔥 ALSO FOR LOGGED OUT */}
+              <ThemeToggle />
 
               <Link
                 href="/login"
@@ -130,7 +134,6 @@ export function Navbar() {
           )}
         </div>
 
-        {/* MOBILE BUTTON */}
         <button
           className="md:hidden p-2 text-foreground"
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -139,11 +142,9 @@ export function Navbar() {
         </button>
       </div>
 
-      {/* MOBILE MENU */}
       {isMobileMenuOpen && (
         <div className="md:hidden absolute top-full left-0 right-0 glass-card rounded-b-2xl border-t border-border p-4 flex flex-col gap-4 shadow-xl">
 
-          {/* 🔥 MOBILE THEME TOGGLE */}
           <ThemeToggle />
 
           {user ? (
