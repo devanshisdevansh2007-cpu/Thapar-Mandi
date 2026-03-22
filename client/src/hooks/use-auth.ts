@@ -12,13 +12,20 @@ export function useAuth() {
 
   const { data: user, isLoading, error } = useQuery<User | null>({
     queryKey: [api.auth.me.path],
-    queryFn: async () => {
-      const res = await fetch(api.auth.me.path, { credentials: "include" });
-      if (res.status === 401) return null;
-      if (!res.ok) throw new Error("Failed to fetch user");
-      const data = await res.json();
-      return parseWithLogging(api.auth.me.responses[200], data, "auth.me");
-    },
+   queryFn: async () => {
+  const res = await fetch(api.auth.me.path, { credentials: "include" });
+
+  if (!res.ok) {
+    return null; // ✅ handle ALL failures safely
+  }
+
+  try {
+    const data = await res.json();
+    return parseWithLogging(api.auth.me.responses[200], data, "auth.me");
+  } catch {
+    return null; // ✅ handles HTML response case
+  }
+},
     retry: false,
   });
 
@@ -66,19 +73,22 @@ export function useAuth() {
     },
   });
 
-  const logoutMutation = useMutation({
-    mutationFn: async () => {
-      const res = await fetch(api.auth.logout.path, {
-        method: api.auth.logout.method,
-        credentials: "include",
-      });
-      if (!res.ok) throw new Error("Logout failed");
-    },
-    onSuccess: () => {
-      queryClient.setQueryData([api.auth.me.path], null);
-      queryClient.invalidateQueries();
-    },
-  });
+ const logoutMutation = useMutation({
+  mutationFn: async () => {
+    const res = await fetch(api.auth.logout.path, {
+      method: api.auth.logout.method,
+      credentials: "include",
+    });
+    if (!res.ok) throw new Error("Logout failed");
+  },
+  onSuccess: () => {
+    queryClient.setQueryData([api.auth.me.path], null);
+
+    queryClient.clear(); // 🔥 stops auto refetch
+
+    window.location.href = "/login"; // 🔥 forces correct page
+  },
+});
 
   return {
     user,
