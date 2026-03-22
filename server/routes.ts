@@ -81,11 +81,8 @@ app.post("/auth/logout", (req, res) => {
   }
 
   const { password, ...safeUser } = req.user!;
-  res.json(safeUser);
+  return res.json(safeUser);
 });
-    const { password, ...safeUser } = req.user!;
-    res.json(safeUser);
-  });
 
   // ================= USER =================
 
