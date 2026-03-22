@@ -20,12 +20,12 @@ export async function registerRoutes(
     next();
   }
 
-  function isNotBlocked(req: any, res: any, next: any) {
-    if (req.user?.blocked) {
-      return res.status(403).json({ message: "You are blocked" });
-    }
-    next();
+ function isNotBlocked(req: any, res: any, next: any) {
+  if (req.user?.blocked) {
+    return res.status(403).json({ message: "You are blocked" });
   }
+  next();
+}
 
   async function isUserBlocked(user1: number, user2: number) {
     const result = await pool.query(
@@ -100,6 +100,52 @@ app.post("/auth/logout", (req, res) => {
     res.json({ success: true });
   });
 
+
+  // ================= ADMIN =================
+
+// ✅ GET ALL USERS
+app.get("/api/admin/users", isAdmin, async (req, res) => {
+  const result = await pool.query(
+    `SELECT id, name, email, role, blocked FROM users ORDER BY id DESC`
+  );
+
+  res.json(result.rows);
+});
+
+// ✅ BLOCK USER (GLOBAL BLOCK)
+app.post("/api/admin/block-user/:id", isAdmin, async (req, res) => {
+  const userId = Number(req.params.id);
+
+  await pool.query(
+    `UPDATE users SET blocked = true WHERE id = $1`,
+    [userId]
+  );
+
+  res.json({ success: true });
+});
+
+// ✅ UNBLOCK USER
+app.post("/api/admin/unblock-user/:id", isAdmin, async (req, res) => {
+  const userId = Number(req.params.id);
+
+  await pool.query(
+    `UPDATE users SET blocked = false WHERE id = $1`,
+    [userId]
+  );
+
+  res.json({ success: true });
+});
+
+// ✅ DELETE ITEM (ADMIN POWER)
+app.delete("/api/admin/item/:id", isAdmin, async (req, res) => {
+  const id = Number(req.params.id);
+
+  await storage.deleteItem(id);
+
+  res.json({ success: true });
+});
+
+  
   // ================= ITEMS =================
 
   app.get(api.items.list.path, async (req, res) => {
