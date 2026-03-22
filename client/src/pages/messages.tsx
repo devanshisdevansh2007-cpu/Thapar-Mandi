@@ -15,7 +15,7 @@ export default function MessagesPage() {
 
   const fetchChats = async () => {
   try {
-    const res = await fetch("/api/chat/user/me");
+    const res = await fetch("/api/chat");
 
     if (!res.ok) {
       setLoading(false);
