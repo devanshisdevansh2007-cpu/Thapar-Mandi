@@ -12,10 +12,20 @@ export default function ChatPage() {
 
   const { user } = useAuth();
 
-  const fetchMessages = async () => {
-    const res = await fetch(`/api/chat/${chatId}/messages`);
+  // 🔥 FETCH BLOCK STATUS (NEW)
+  const checkBlocked = async (otherUserId: number) => {
+    const res = await fetch(`/api/is-blocked/${otherUserId}`, {
+      credentials: "include",
+    });
+    const data = await res.json();
+    setIsBlocked(data.blocked);
+  };
 
-    // 🔥 BLOCK HANDLE
+  const fetchMessages = async () => {
+    const res = await fetch(`/api/chat/${chatId}/messages`, {
+      credentials: "include",
+    });
+
     if (res.status === 403) {
       setIsBlocked(true);
       return;
@@ -25,6 +35,11 @@ export default function ChatPage() {
 
     setMessages(data.messages || data);
     setProduct(data.product || null);
+
+    // 🔥 IMPORTANT: once product loaded → check block
+    if (data.product?.seller_id) {
+      checkBlocked(data.product.seller_id);
+    }
   };
 
   const formatTime = (date: any) => {
@@ -63,6 +78,7 @@ export default function ChatPage() {
         chatId,
         text,
       }),
+      credentials: "include",
     });
 
     if (res.status === 403) {
@@ -76,7 +92,6 @@ export default function ChatPage() {
 
   useEffect(() => {
     fetchMessages();
-
     const interval = setInterval(fetchMessages, 2000);
     return () => clearInterval(interval);
   }, [chatId]);
@@ -121,6 +136,7 @@ export default function ChatPage() {
             onClick={async () => {
               await fetch(`/api/unblock/${product?.seller_id}`, {
                 method: "DELETE",
+                credentials: "include",
               });
               setIsBlocked(false);
               fetchMessages();
@@ -134,6 +150,7 @@ export default function ChatPage() {
             onClick={async () => {
               await fetch(`/api/block/${product?.seller_id}`, {
                 method: "POST",
+                credentials: "include",
               });
               setIsBlocked(true);
             }}
