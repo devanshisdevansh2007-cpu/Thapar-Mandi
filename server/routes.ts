@@ -114,14 +114,24 @@ app.get("/api/admin/users", isAdmin, async (req, res) => {
 
 // ✅ BLOCK USER (GLOBAL BLOCK)
 app.post("/api/admin/block-user/:id", isAdmin, async (req, res) => {
-  const userId = Number(req.params.id);
+  try {
+    const userId = Number(req.params.id);
 
-  await pool.query(
-    `UPDATE users SET blocked = true WHERE id = $1`,
-    [userId]
-  );
+    if (!userId) {
+      return res.status(400).json({ message: "Invalid user ID" });
+    }
 
-  res.json({ success: true });
+    await pool.query(
+      `UPDATE users SET blocked = true WHERE id = $1`,
+      [userId]
+    );
+
+    res.json({ success: true });
+
+  } catch (err) {
+    console.error("Block error:", err);
+    res.status(500).json({ message: "Server crashed" });
+  }
 });
 
 // ✅ UNBLOCK USER
