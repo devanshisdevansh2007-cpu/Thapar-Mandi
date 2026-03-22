@@ -6,7 +6,7 @@ export default function AdminPage() {
   const [items, setItems] = useState<any[]>([]);
   const [users, setUsers] = useState<any[]>([]);
 
-  // 🔥 FETCH DATA (SAFE)
+  // 🔥 FETCH DATA
   useEffect(() => {
     fetch("/api/items", { credentials: "include" })
       .then(res => res.json())
@@ -31,29 +31,47 @@ export default function AdminPage() {
   const deleteItem = async (id: number) => {
     if (!confirm("Delete this item?")) return;
 
-    await fetch(`/api/admin/item/${id}`, {
+    const res = await fetch(`/api/admin/item/${id}`, {
       method: "DELETE",
+      credentials: "include",
     });
+
+    if (!res.ok) {
+      alert("Delete failed");
+      return;
+    }
 
     setItems(items.filter(i => i.id !== id));
   };
 
   // 🚫 BLOCK USER
   const blockUser = async (id: number) => {
-    await fetch(`/api/admin/block-user/${id}`, {
+    const res = await fetch(`/api/admin/block-user/${id}`, {
       method: "POST",
+      credentials: "include",
     });
+
+    if (!res.ok) {
+      alert("Block failed");
+      return;
+    }
 
     setUsers(users.map(u =>
       u.id === id ? { ...u, blocked: true } : u
     ));
   };
 
-  // ✅ UNBLOCK USER (🔥 NEW)
+  // ✅ UNBLOCK USER
   const unblockUser = async (id: number) => {
-    await fetch(`/api/admin/unblock-user/${id}`, {
+    const res = await fetch(`/api/admin/unblock-user/${id}`, {
       method: "POST",
+      credentials: "include",
     });
+
+    if (!res.ok) {
+      alert("Unblock failed");
+      return;
+    }
 
     setUsers(users.map(u =>
       u.id === id ? { ...u, blocked: false } : u
