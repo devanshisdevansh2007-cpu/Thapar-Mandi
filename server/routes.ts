@@ -297,7 +297,38 @@ app.delete("/api/admin/item/:id", isAdmin, async (req, res) => {
   });
 
   // ================= CHAT =================
+app.get("/api/chat", async (req, res) => {
+  if (!req.isAuthenticated()) return res.sendStatus(401);
 
+  const userId = req.user!.id;
+
+  const result = await pool.query(
+    `SELECT 
+      chats.id,
+      items.title AS item_title,
+      users.name AS other_user,
+      (
+        SELECT text FROM messages 
+        WHERE chat_id = chats.id 
+        ORDER BY created_at DESC 
+        LIMIT 1
+      ) AS last_message,
+      0 AS unread_count
+    FROM chats
+    JOIN items ON items.id = chats.item_id
+    JOIN users ON users.id = 
+      CASE 
+        WHEN chats.buyer_id = $1 THEN chats.seller_id
+        ELSE chats.buyer_id
+      END
+    WHERE chats.buyer_id = $1 OR chats.seller_id = $1
+    ORDER BY chats.id DESC`,
+    [userId]
+  );
+
+  res.json(result.rows);
+});
+  
   app.get("/api/chat/:chatId/messages", async (req, res) => {
     if (!req.isAuthenticated()) return res.sendStatus(401);
 
