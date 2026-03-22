@@ -115,7 +115,7 @@ app.get("/api/admin/users", isAdmin, async (req, res) => {
 // ✅ BLOCK USER (GLOBAL BLOCK)
 app.post("/api/admin/block-user/:id", isAdmin, async (req, res) => {
   try {
-    const userId = Number(req.params.id);
+    const userId = req.params.id; // ✅ FIXED
 
     if (!userId) {
       return res.status(400).json({ message: "Invalid user ID" });
@@ -133,7 +133,6 @@ app.post("/api/admin/block-user/:id", isAdmin, async (req, res) => {
     res.status(500).json({ message: "Server crashed" });
   }
 });
-
 // ✅ UNBLOCK USER
 app.post("/api/admin/unblock-user/:id", isAdmin, async (req, res) => {
   const userId = Number(req.params.id);
