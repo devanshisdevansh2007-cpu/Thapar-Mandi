@@ -3,12 +3,12 @@ import { api } from "@shared/routes";
 import { z } from "zod";
 import { Tag } from "lucide-react";
 import { useState } from "react";
-
+import { useAuth } from "@/hooks/use-auth";
 
 type Item = z.infer<typeof api.items.list.responses[200]>[0];
 
 export function ItemCard({ item }: { item: Item }) {
-
+const { user } = useAuth();
   // ✅ YAHAN PASTE KARNA HAI
   const [showReport, setShowReport] = useState(false);
   const [reason, setReason] = useState("");
@@ -19,17 +19,21 @@ export function ItemCard({ item }: { item: Item }) {
     return;
   }
 
-  await fetch("/api/reports", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      reported_item_id: item.id,
-      reason,
-    }),
-  });
+const res = await fetch("/api/reports", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    reporter_id: user?.id,
+    reported_user_id: item.seller?.id,
+    reported_item_id: item.id,
+    reason,
+  }),
+});
 
+const data = await res.json();
+console.log("REPORT RESPONSE:", data);
   alert("Reported successfully");
 
   setShowReport(false);
