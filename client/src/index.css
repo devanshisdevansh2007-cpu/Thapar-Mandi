@@ -111,10 +111,13 @@
 
 @layer utilities {
   .glass-card {
-    @apply bg-card shadow-lg border border-black/10 backdrop-blur-sm;
-  }
+  @apply bg-card shadow-lg border border-border backdrop-blur-sm;
+}
   
   .glass-input {
-    @apply bg-white/40 border border-black/10 focus:bg-white/60 focus:ring-4 focus:ring-primary/20 transition-all duration-300;
-  }
+  @apply bg-input/60 border border-border 
+         focus:bg-input/80 
+         focus:ring-4 focus:ring-primary/20 
+         transition-all duration-300;
+}
 }
