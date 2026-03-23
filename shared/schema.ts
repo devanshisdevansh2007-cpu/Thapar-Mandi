@@ -42,3 +42,21 @@ export type Item = typeof items.$inferSelect;
 export type InsertItem = z.infer<typeof insertItemSchema>;
 
 export type UserWithoutPassword = Omit<User, "password">;
+
+export const reports = pgTable("reports", {
+  id: uuid("id").defaultRandom().primaryKey(),
+
+  reporter_id: uuid("reporter_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+
+  reported_user_id: uuid("reported_user_id")
+    .references(() => users.id, { onDelete: "cascade" }),
+
+  reported_item_id: integer("reported_item_id")
+    .references(() => items.id, { onDelete: "cascade" }),
+
+  reason: text("reason").notNull(),
+
+  created_at: timestamp("created_at").defaultNow(),
+});  
