@@ -120,7 +120,6 @@ const getTimeAgo = (date: string) => {
 </button>
 
 </div>
-        </div>
       </div>
    </Link>
 
