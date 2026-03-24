@@ -18,7 +18,7 @@ export default function AdminPage() {
       .then(res => res.json())
       .then(data => setUsers(Array.isArray(data) ? data : []));
 
-    fetch("/api/reports", { credentials: "include" })
+  fetch("/api/admin/reports", { credentials: "include" })
       .then(res => res.json())
       .then(data => {
         console.log("REPORTS:", data);
