@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 
 
 export default function CursorFollower() {
+ 
   const [isHovering, setIsHovering] = useState(false);
   const [ripples, setRipples] = useState<
   { x: number; y: number; id: number }[]
@@ -10,14 +11,20 @@ export default function CursorFollower() {
   const { x, y } = useCursor();
 
   const posRef = useRef({ x: 0, y: 0 });
+   const velocityRef = useRef({ x: 0, y: 0 });
   const [dots, setDots] = useState(
     Array.from({ length: 6 }, () => ({ x: 0, y: 0 }))
   );
 
   // 🔥 update ref (no re-render)
   useEffect(() => {
-    posRef.current = { x, y };
-  }, [x, y]);
+  velocityRef.current = {
+    x: x - posRef.current.x,
+    y: y - posRef.current.y,
+  };
+
+  posRef.current = { x, y };
+}, [x, y]);
 
   useEffect(() => {
     const speed = 0.12;
@@ -127,17 +134,28 @@ useEffect(() => {
 
   return (
     <>
-      {dots.map((dot, i) => (
+     {dots.map((dot, i) => {
+      const velocity = Math.min(
+  Math.sqrt(
+    velocityRef.current.x ** 2 + velocityRef.current.y ** 2
+  ),
+  20
+);
+
+const stretch = velocity / 6;
+
+      return (
         <div
           key={i}
           style={{
             position: "fixed",
             left: dot.x,
             top: dot.y,
-          transform: `translate(-50%, -50%) 
+         
+transform: `translate(-50%, -50%) 
   scale(${isHovering && i === 0 ? 2.2 : 1}) 
-  scaleX(${isHovering && i === 0 ? 1.3 : 1}) 
-  scaleY(${isHovering && i === 0 ? 0.8 : 1})`,
+  scaleX(${isHovering && i === 0 ? 1 + stretch : 1}) 
+  scaleY(${isHovering && i === 0 ? 1 - stretch * 0.5 : 1})`,
             pointerEvents: "none",
             zIndex: 9999,
             opacity: 1 - i * 0.15,
@@ -146,21 +164,20 @@ useEffect(() => {
   : "0 0 20px rgba(255, 120, 220, 0.2)",
           }}
         >
-          <div
-            style={{
-              width: `${20 - i * 2}px`,
-              height: `${20 - i * 2}px`,
-              borderRadius: "50%",
-              background: isHovering
-  ? "linear-gradient(135deg, #ffd166, #ff70a6)"
-  : "linear-gradient(135deg, #ff70a6, #c77dff)",
-      
-              filter: "blur(16px)",
-              mixBlendMode: "screen",
-            }}
-          />
-        </div>
-      ))}
+         <div
+  style={{
+    width: `${20 - i * 2}px`,
+    height: `${20 - i * 2}px`,
+    borderRadius: "50%",
+    background: isHovering
+      ? "rgba(255, 200, 100, 0.9)"
+      : "rgba(255, 120, 220, 0.7)",
+    filter: "blur(12px)",
+  }}
+/>
+                </div>
+      );
+    })}
 
       {ripples.map(r => (
   <div
