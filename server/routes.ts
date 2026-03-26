@@ -195,6 +195,24 @@ app.delete("/api/admin/item/:id", isAdmin, async (req, res) => {
   res.json({ success: true });
 });
 
+  // ✅ RESOLVE REPORT (DELETE REPORT)
+app.post("/api/admin/reports/:id/resolve", isAdmin, async (req, res) => {
+  try {
+    const reportId = req.params.id;
+
+    await pool.query(
+      `DELETE FROM reports WHERE id = $1`,
+      [reportId]
+    );
+
+    res.json({ success: true });
+
+  } catch (err) {
+    console.error("Resolve report error:", err);
+    res.status(500).json({ message: "Failed to resolve report" });
+  }
+});
+
   
   // ================= ITEMS =================
 
