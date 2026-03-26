@@ -1,7 +1,9 @@
 import { useCursor } from "@/hooks/useCursor";
 import { useEffect, useRef, useState } from "react";
 
+
 export default function CursorFollower() {
+  const [isHovering, setIsHovering] = useState(false);
   const { x, y } = useCursor();
 
   const posRef = useRef({ x: 0, y: 0 });
@@ -46,6 +48,25 @@ export default function CursorFollower() {
     return () => cancelAnimationFrame(animationFrame);
   }, []);
 
+  useEffect(() => {
+  const handleEnter = () => setIsHovering(true);
+  const handleLeave = () => setIsHovering(false);
+
+ const elements = document.querySelectorAll("button, a, input, textarea");
+
+  elements.forEach(el => {
+    el.addEventListener("mouseenter", handleEnter);
+    el.addEventListener("mouseleave", handleLeave);
+  });
+
+  return () => {
+    elements.forEach(el => {
+      el.removeEventListener("mouseenter", handleEnter);
+      el.removeEventListener("mouseleave", handleLeave);
+    });
+  };
+}, []);
+
   return (
     <>
       {dots.map((dot, i) => (
@@ -55,10 +76,14 @@ export default function CursorFollower() {
             position: "fixed",
             left: dot.x,
             top: dot.y,
-            transform: "translate(-50%, -50%)",
+           transform: `translate(-50%, -50%) scale(${isHovering && i === 0 ? 2 : 1})`,
+transition: "transform 0.25s cubic-bezier(0.22, 1, 0.36, 1)",
             pointerEvents: "none",
             zIndex: 9999,
             opacity: 1 - i * 0.15,
+            boxShadow: isHovering && i === 0
+  ? "0 0 30px rgba(255, 200, 100, 0.5)"
+  : "none",
           }}
         >
           <div
@@ -66,8 +91,11 @@ export default function CursorFollower() {
               width: `${20 - i * 2}px`,
               height: `${20 - i * 2}px`,
               borderRadius: "50%",
-              background: "rgba(255, 120, 220, 0.7)",
-              filter: "blur(12px)",
+              background: isHovering
+  ? "linear-gradient(135deg, #ffd166, #ff70a6)"
+  : "linear-gradient(135deg, #ff70a6, #c77dff)",
+      
+              filter: "blur(16px)",
             }}
           />
         </div>
