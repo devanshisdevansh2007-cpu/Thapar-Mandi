@@ -3,12 +3,22 @@ import { useAuth } from "@/hooks/use-auth";
 import { Link } from "wouter";
 import { Store, PlusCircle, Package, ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useLocation } from "wouter";
 import CursorFollower from "@/components/CursorFollower";
 export function Dashboard() {
   const { user, isLoading } = useAuth();
  const [, setLocation] = useLocation();
+  const cardRef = useRef<HTMLDivElement>(null);
+
+const [pos, setPos] = useState({
+  x: 0,
+  y: 0,
+});
+  const [smoothPos, setSmoothPos] = useState({
+  x: 0,
+  y: 0,
+});
 
   // 🔥 IMPORTANT: useEffect redirect (not inline)
   useEffect(() => {
@@ -16,6 +26,22 @@ export function Dashboard() {
       setLocation("/login");
     }
   }, [user, isLoading]);
+
+  useEffect(() => {
+  const lerp = (start: number, end: number, t: number) =>
+    start + (end - start) * t;
+
+  const animate = () => {
+    setSmoothPos((prev) => ({
+      x: lerp(prev.x, pos.x, 0.07),
+y: lerp(prev.y, pos.y, 0.07),
+    }));
+
+    requestAnimationFrame(animate);
+  };
+
+  animate();
+}, [pos]);
 
   if (isLoading || !user) return null;
 
@@ -31,6 +57,24 @@ const [hostel, setHostel] = useState(user?.hostel || "");
 
  window.location.reload();
 };
+  const handleMouseMove = (e: React.MouseEvent) => {
+  const rect = cardRef.current?.getBoundingClientRect();
+  if (!rect) return;
+
+  const x = e.clientX - rect.left - rect.width / 2;
+  const y = e.clientY - rect.top - rect.height / 2;
+
+  setPos({
+    x: x / 20,
+    y: y / 20,
+  });
+};
+
+const handleMouseLeave = () => {
+  setPos({ x: 0, y: 0 });
+};
+
+  
   const actions = [
     {
       title: "Browse Marketplace",
@@ -64,14 +108,30 @@ const [hostel, setHostel] = useState(user?.hostel || "");
       <CursorFollower />   {/* ✅ YE LINE ADD KAR */}
       
       <div className="max-w-4xl mx-auto space-y-12 py-8">
-        <motion.div 
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="glass-card p-8 md:p-12 rounded-3xl relative overflow-hidden"
-        >
-          <div className="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 bg-primary/10 rounded-full blur-3xl pointer-events-none" />
+       <motion.div 
+  ref={cardRef}
+  onMouseMove={handleMouseMove}
+  onMouseLeave={handleMouseLeave}
+  initial={{ opacity: 0, y: 10 }}
+  animate={{ opacity: 1, y: 0 }}
+        style={{
+ transform: `translate(${smoothPos.x * 2.5}px, ${smoothPos.y * 2.5}px) scale(1.04)`
+}}
+ className="glass-card p-8 md:p-12 rounded-3xl relative overflow-hidden transition-transform duration-200 ease-out"
+>
+          <div
+  className="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 bg-primary/10 rounded-full blur-3xl pointer-events-none"
+ style={{
+  transform: `translate(${smoothPos.x * 2.5}px, ${smoothPos.y * 2.5}px)`
+}}
+/>
           
-          <h1 className="text-3xl md:text-5xl font-display font-extrabold text-foreground mb-4">
+          <h1
+  className="text-3xl md:text-5xl font-display font-extrabold text-foreground mb-4 transition-transform duration-200"
+  style={{
+    transform: `translate(${smoothPos.x * 1.5}px, ${smoothPos.y * 1.5}px)`
+  }}
+>
             Welcome back, <span className="text-primary">{user.name ? user.name.split(' ')[0] : ""}</span>! 👋
           </h1>
           <p className="text-lg text-foreground/80 font-medium max-w-xl">
