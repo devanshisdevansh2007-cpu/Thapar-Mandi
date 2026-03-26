@@ -70,7 +70,7 @@ export default function AdminPage() {
       method: "POST",
       credentials: "include",
     });
-
+    
     if (!res.ok) {
       alert("Unblock failed");
       return;
@@ -80,6 +80,21 @@ export default function AdminPage() {
       u.id === id ? { ...u, blocked: false } : u
     ));
   };
+
+  // ✅ RESOLVE REPORT (CORRECT PLACE)
+const resolveReport = async (id: string) => {
+  const res = await fetch(`/api/admin/reports/${id}/resolve`, {
+    method: "POST",
+    credentials: "include",
+  });
+
+  if (!res.ok) {
+    alert("Resolve failed");
+    return;
+  }
+
+  setReports(reports.filter(r => r.id !== id));
+};
 
   return (
     <div className="p-6">
@@ -177,19 +192,28 @@ export default function AdminPage() {
       </div>
 
       {/* Actions */}
-      <div className="flex gap-2">
-        <button className="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600">
-          🗑 Delete Item
-        </button>
+ <div className="flex gap-2">
+  <button
+    onClick={() => deleteItem(r.reported_item_id)}
+    className="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600"
+  >
+    🗑 Delete Item
+  </button>
 
-        <button className="bg-orange-500 text-white px-3 py-1 rounded text-sm hover:bg-orange-600">
-          🚫 Ban User
-        </button>
+  <button
+    onClick={() => blockUser(r.reported_user_id)}
+    className="bg-orange-500 text-white px-3 py-1 rounded text-sm hover:bg-orange-600"
+  >
+    🚫 Ban User
+  </button>
 
-        <button className="bg-green-500 text-white px-3 py-1 rounded text-sm hover:bg-green-600">
-          ✅ Resolve
-        </button>
-      </div>
+  <button
+    onClick={() => resolveReport(r.id)}
+    className="bg-green-500 text-white px-3 py-1 rounded text-sm hover:bg-green-600"
+  >
+    ✅ Resolve
+  </button>
+</div>
     </div>
   ))}
 </div>
