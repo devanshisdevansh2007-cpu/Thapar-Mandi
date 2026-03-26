@@ -128,29 +128,31 @@ const getTimeAgo = (date: string) => {
    </Link>
 
     {showReport && (
-  <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-    <div className="bg-white p-4 rounded-xl w-[300px]">
+  <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+<div className="bg-white p-4 rounded-xl w-[300px] dark:bg-zinc-900 dark:border dark:border-zinc-700">
       <h2 className="text-lg font-semibold mb-2">Report Item</h2>
 
       <textarea
         placeholder="Explain the issue..."
         value={reason}
         onChange={(e) => setReason(e.target.value)}
-        className="w-full border p-2 rounded mb-2"
+       className="w-full border p-2 rounded mb-2 bg-white text-black dark:bg-zinc-800 dark:text-white dark:border-zinc-700"
       />
-
-      <p className="text-xs text-gray-500 mb-2">
+<p className="text-xs text-gray-600 dark:text-gray-300 mb-2">
         Admin may contact you regarding this report.
       </p>
 
       <div className="flex justify-end gap-2">
-        <button onClick={() => setShowReport(false)}>
-          Cancel
-        </button>
+        <button
+  onClick={() => setShowReport(false)}
+  className="px-3 py-1 rounded bg-gray-200 text-black dark:bg-zinc-700 dark:text-white dark:hover:bg-zinc-600"
+>
+  Cancel
+</button>
 
         <button
           onClick={handleSubmit}
-          className="bg-red-500 text-white px-3 py-1 rounded"
+       className="bg-red-500 text-white px-3 py-1 rounded dark:bg-red-500 dark:hover:bg-red-600"
         >
           Submit
         </button>
