@@ -148,7 +148,7 @@ app.post("/auth/forgot-password", async (req, res) => {
     const hashedPassword = await hashPassword(newPassword);
 
     await storage.updateUserPassword(user.id, hashedPassword);
-
+await storage.updateUserResetToken(user.id, null, null);
     res.json({ message: "Password updated successfully" });
 
   } catch (err) {
