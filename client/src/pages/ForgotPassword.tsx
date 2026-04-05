@@ -18,7 +18,7 @@ export default function ForgotPassword() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen gap-4">
+   <div className="forgot-password-page flex flex-col items-center justify-center h-screen gap-4">
       <h1 className="text-xl font-semibold">Forgot Password</h1>
 
       <input
