@@ -132,3 +132,14 @@
     opacity: 0;
   }
 }
+
+/* 🔥 ONLY this page + ONLY dark mode fix */
+.dark .forgot-password-page input {
+  color: hsl(var(--foreground)) !important;
+  background-color: hsl(var(--input)) !important;
+  border-color: hsl(var(--border)) !important;
+}
+
+.dark .forgot-password-page input::placeholder {
+  color: hsl(var(--muted-foreground)) !important;
+}
