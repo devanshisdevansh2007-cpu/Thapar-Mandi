@@ -5,7 +5,8 @@ import { api } from "@shared/routes";
 import { setupAuth } from "./auth";
 import passport from "passport";
 import { pool } from "./db";
-
+import { verifyOTP, saveOTP } from "./otpStore";
+import { generateOTP } from "./otp";
 export async function registerRoutes(
   httpServer: Server,
   app: Express,
@@ -298,6 +299,29 @@ app.post("/api/admin/reports/:id/resolve", isAdmin, async (req, res) => {
     await storage.deleteItem(id);
     res.json({ success: true });
   });
+  app.post("/auth/send-otp", async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({ message: "Email required" });
+    }
+
+    const otp = generateOTP();   // 🔥 generate
+    saveOTP(email, otp);         // 🔥 STORE HERE
+
+    console.log("OTP:", otp); // debug (baad me hata dena)
+
+    // 👉 yahan email bhejna hai (Resend etc)
+    // await sendEmail(email, otp);
+
+    res.json({ success: true });
+
+  } catch (err) {
+    console.error("SEND OTP ERROR:", err);
+    res.status(500).json({ message: "Failed to send OTP" });
+  }
+});
 app.get("/api/my-listings", async (req, res) => {
   if (!req.isAuthenticated()) {
     return res.status(401).json({ message: "Unauthorized" });
