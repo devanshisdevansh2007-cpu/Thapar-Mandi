@@ -13,7 +13,7 @@ const pool = new Pool({
 });
 
 const app = express();
-app.use(express.json());
+
 const httpServer = createServer(app);
 
 
@@ -26,15 +26,15 @@ declare module "http" {
 
 app.use(
   express.json({
-    limit: "10mb",
+    limit: "25mb",
     verify: (req, _res, buf) => {
       req.rawBody = buf;
     },
   }),
 );
 
-app.use(express.urlencoded({ limit: "10mb", extended: false }));
-app.use(express.urlencoded({ extended: false }));
+app.use(express.urlencoded({ limit: "25mb", extended: false }));
+
 
 export function log(message: string, source = "express") {
   const formattedTime = new Date().toLocaleTimeString("en-US", {
